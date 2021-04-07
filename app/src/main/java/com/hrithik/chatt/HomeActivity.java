@@ -34,19 +34,31 @@ public class HomeActivity extends AppCompatActivity {
     private ArrayList<Users> arrayList;
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        if(FirebaseAuth.getInstance().getCurrentUser() == null) {
+            startActivity(new Intent(this, SignIn.class));
+            finishAffinity();
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
+        arrayList = new ArrayList<>();
 
         reference = database.getReference().child("user");
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                arrayList.clear();
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Users user = dataSnapshot.getValue(Users.class);
+                    if(!user.getUid().equals(auth.getUid()))
                     arrayList.add(user);
                 }
                 userAdapter.notifyDataSetChanged();
@@ -92,10 +104,5 @@ public class HomeActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         userAdapter = new UserAdapter(this, arrayList);
         recyclerView.setAdapter(userAdapter);
-
-        if(auth.getCurrentUser() == null) {
-            startActivity(new Intent(HomeActivity.this, SignIn.class));
-            finishAffinity();
-        }
     }
 }

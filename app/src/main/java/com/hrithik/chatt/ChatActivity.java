@@ -2,6 +2,8 @@ package com.hrithik.chatt;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,6 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -36,6 +39,7 @@ public class ChatActivity extends AppCompatActivity {
     private ArrayList<Messages> arrayList;
     private MessagesAdapter messagesAdapter;
 
+    private ViewModel viewModel;
     private FirebaseDatabase database;
 
     @Override
@@ -43,6 +47,7 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+        viewModel = new ViewModelProvider(this, new ViewModelFactory(getApplication(), getIntent().getLongExtra("id", -1))).get(ViewModel.class);
         database = FirebaseDatabase.getInstance();
 
         name = getIntent().getStringExtra("name");
@@ -75,7 +80,7 @@ public class ChatActivity extends AppCompatActivity {
         user_name.setText(name);
 
         DatabaseReference chatReference = database.getReference().child("chats").child(senderRoom).child("messages");
-        chatReference.addValueEventListener(new ValueEventListener() {
+        /*chatReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 arrayList.clear();
@@ -90,6 +95,15 @@ public class ChatActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
+        });*/
+
+        viewModel.getMessages().observe(this, new Observer<List<Messages>>() {
+            @Override
+            public void onChanged(List<Messages> messages) {
+                arrayList.clear();
+                arrayList.addAll(messages);
+                messagesAdapter.notifyDataSetChanged();
+            }
         });
 
         sendBtn.setOnClickListener(new View.OnClickListener() {
@@ -100,6 +114,7 @@ public class ChatActivity extends AppCompatActivity {
                     editMessage.setText(null);
                     Date date = new Date();
                     final Messages msg = new Messages(message, senderUid, date.getTime());
+
                     database.getReference().child("chats").child(senderRoom).child("messages").push().setValue(msg)
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override

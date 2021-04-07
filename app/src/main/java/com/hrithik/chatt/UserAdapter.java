@@ -31,14 +31,15 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final Users user = arrayList.get(position);
-        holder.name.setText(user.name);
+        holder.name.setText(user.getName());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(homeActivity, ChatActivity.class);
-                intent.putExtra("name", user.name);
+                intent.putExtra("name", user.getName());
                 intent.putExtra("uid", user.getUid());
+                intent.putExtra("id", user.getId());
                 homeActivity.startActivity(intent);
             }
         });

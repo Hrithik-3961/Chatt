@@ -30,6 +30,16 @@ public class SignIn extends AppCompatActivity {
     private String regex = "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$";
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        if(FirebaseAuth.getInstance().getCurrentUser() != null) {
+            startActivity(new Intent(this, HomeActivity.class));
+            finishAffinity();
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signin);
