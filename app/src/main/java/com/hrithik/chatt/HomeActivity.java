@@ -28,7 +28,7 @@ public class HomeActivity extends AppCompatActivity {
     private DatabaseReference reference;
 
     private RecyclerView recyclerView;
-    private Adapter adapter;
+    private UserAdapter userAdapter;
     private ImageView logout;
 
     private ArrayList<Users> arrayList;
@@ -49,7 +49,7 @@ public class HomeActivity extends AppCompatActivity {
                     Users user = dataSnapshot.getValue(Users.class);
                     arrayList.add(user);
                 }
-                adapter.notifyDataSetChanged();
+                userAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -90,8 +90,8 @@ public class HomeActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new Adapter(this, arrayList);
-        recyclerView.setAdapter(adapter);
+        userAdapter = new UserAdapter(this, arrayList);
+        recyclerView.setAdapter(userAdapter);
 
         if(auth.getCurrentUser() == null) {
             startActivity(new Intent(HomeActivity.this, SignIn.class));
