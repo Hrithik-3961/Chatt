@@ -1,6 +1,7 @@
 package com.hrithik.chatt;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,12 +43,28 @@ public class MessagesAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
 
         Messages msg = arrayList.get(position);
+        Messages nxtMsg = new Messages();
+        if(position != 0)
+        nxtMsg = arrayList.get(position-1);
+
         if(holder.getClass() == SenderViewHolder.class){
             SenderViewHolder viewHolder = (SenderViewHolder) holder;
-            viewHolder.msg.setText(msg.getMessage());
+            if(position != 0 && nxtMsg.getSenderId().equals(msg.getSenderId())) {
+                viewHolder.msgContinued.setText(msg.getMessage());
+                viewHolder.msgContinued.setVisibility(View.VISIBLE);
+                viewHolder.msg.setVisibility(View.GONE);
+            }
+            else
+                viewHolder.msg.setText(msg.getMessage());
         }
         else {
             ReceiverViewHolder viewHolder = (ReceiverViewHolder) holder;
+            if(position != 0 && nxtMsg.getSenderId().equals(msg.getSenderId())) {
+                viewHolder.msgContinued.setText(msg.getMessage());
+                viewHolder.msgContinued.setVisibility(View.VISIBLE);
+                viewHolder.msg.setVisibility(View.GONE);
+            }
+            else
             viewHolder.msg.setText(msg.getMessage());
         }
 
@@ -69,20 +86,22 @@ public class MessagesAdapter extends RecyclerView.Adapter {
 
     class SenderViewHolder extends RecyclerView.ViewHolder {
 
-        TextView msg;
+        TextView msg, msgContinued;
 
         public SenderViewHolder(@NonNull View itemView) {
             super(itemView);
             msg = itemView.findViewById(R.id.msgSend);
+            msgContinued = itemView.findViewById(R.id.msgSendContinued);
         }
     }
 
     class ReceiverViewHolder extends RecyclerView.ViewHolder {
 
-        TextView msg;
+        TextView msg, msgContinued;
         public ReceiverViewHolder(@NonNull View itemView) {
             super(itemView);
             msg = itemView.findViewById(R.id.msgReceive);
+            msgContinued = itemView.findViewById(R.id.msgReceiveContinued);
         }
     }
 }

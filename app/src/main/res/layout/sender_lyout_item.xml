@@ -1,22 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="10dp">
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/msgSend"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:layout_centerVertical="true"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="60dp"
+        android:layout_marginTop="15dp"
         android:background="@drawable/sender_shape"
         android:lineSpacingExtra="2dp"
         android:paddingStart="10dp"
-        android:paddingTop="4dp"
-        android:paddingEnd="20dp"
-        android:paddingBottom="10dp"/>
+        android:paddingTop="5dp"
+        android:paddingEnd="15dp"
+        android:paddingBottom="8dp"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/msgSendContinued"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="60dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/sender_shape_continued"
+        android:paddingHorizontal="8dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="8dp"
+        android:textSize="20sp"
+        android:visibility="gone" />
 
 </RelativeLayout>
