@@ -38,7 +38,8 @@
         android:layout_height="wrap_content"
         android:layout_above="@id/sendLayout"
         android:layout_below="@id/toolbar"
-        android:padding="15dp"/>
+        android:padding="15dp"
+        android:background="@android:color/darker_gray"/>
 
     <LinearLayout
         android:id="@+id/sendLayout"
@@ -46,7 +47,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="10dp">
+        android:padding="10dp">
 
         <EditText
             android:id="@+id/message"
@@ -54,6 +55,8 @@
             android:layout_height="wrap_content"
             android:inputType="textMultiLine"
             android:layout_weight="1"
+            android:background="@null"
+            android:layout_gravity="center"
             android:layout_marginHorizontal="10dp"
             android:hint="@string/enter_your_message" />
 

@@ -2,12 +2,15 @@ package com.hrithik.chatt;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -20,6 +23,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -32,6 +36,7 @@ public class HomeActivity extends AppCompatActivity {
     private ImageView logout;
 
     private ArrayList<Users> arrayList;
+    private ViewModel viewModel;
 
     @Override
     protected void onStart() {
@@ -47,26 +52,34 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        auth = FirebaseAuth.getInstance();
-        database = FirebaseDatabase.getInstance();
         arrayList = new ArrayList<>();
 
+        auth = FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance();
         reference = database.getReference().child("user");
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                arrayList.clear();
+
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Users user = dataSnapshot.getValue(Users.class);
-                    if(!user.getUid().equals(auth.getUid()))
-                    arrayList.add(user);
+                    viewModel.insertUser(user);
                 }
-                userAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
+            }
+        });
+
+        viewModel = new ViewModelProvider(this, new ViewModelFactory(getApplication(), "")).get(ViewModel.class);
+        viewModel.getAllUsers().observe(this, new Observer<List<Users>>() {
+            @Override
+            public void onChanged(List<Users> users) {
+                arrayList.clear();
+                arrayList.addAll(users);
+                userAdapter.notifyDataSetChanged();
             }
         });
 
@@ -102,6 +115,7 @@ public class HomeActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setHasFixedSize(true);
         userAdapter = new UserAdapter(this, arrayList);
         recyclerView.setAdapter(userAdapter);
     }

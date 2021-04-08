@@ -12,16 +12,21 @@ public class Repository {
 
     private RoomDao roomDao;
     private LiveData<List<Users>> allUsers;
-    private LiveData<List<UserMessages>> messages;
+    private LiveData<UserMessages> messages;
     private RoomDatabase roomDatabase;
 
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-    public Repository(Application application, long id) {
+    public Repository(Application application) {
         roomDatabase = RoomDatabase.getInstance(application);
         roomDao = roomDatabase.roomDao();
         allUsers = roomDao.getAllUsers();
-        messages = roomDao.getMessages(id);
+    }
+
+    public Repository(Application application, String roomId) {
+        roomDatabase = RoomDatabase.getInstance(application);
+        roomDao = roomDatabase.roomDao();
+        messages = roomDao.getMessages(roomId);
     }
 
     public void insertUser(final Users user) {
@@ -33,7 +38,7 @@ public class Repository {
         });
     }
 
-    public void insertMessage(final Messages msg){
+    public void insertMessage(final UserMessages msg){
         executorService.execute(new Runnable() {
             @Override
             public void run() {
@@ -55,7 +60,7 @@ public class Repository {
         return allUsers;
     }
 
-    public LiveData<List<UserMessages>> getMessages() {
+    public LiveData<UserMessages> getMessages() {
         return messages;
     }
 }

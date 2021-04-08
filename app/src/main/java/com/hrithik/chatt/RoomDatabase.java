@@ -4,8 +4,10 @@ import android.content.Context;
 
 import androidx.room.Database;
 import androidx.room.Room;
+import androidx.room.TypeConverters;
 
-@Database(entities = {Users.class, Messages.class}, version = 1)
+@Database(entities = {Users.class, UserMessages.class}, version = 1)
+@TypeConverters(Converter.class)
 public abstract class RoomDatabase extends androidx.room.RoomDatabase {
 
     public static RoomDatabase instance;

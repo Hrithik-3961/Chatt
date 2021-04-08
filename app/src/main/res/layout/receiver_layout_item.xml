@@ -12,6 +12,10 @@
         android:layout_centerVertical="true"
         android:layout_marginEnd="60dp"
         android:background="@drawable/receiver_shape"
-        android:padding="10dp"/>
+        android:lineSpacingExtra="2dp"
+        android:paddingStart="20dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="10dp"/>
 
 </RelativeLayout>

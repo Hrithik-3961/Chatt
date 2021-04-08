@@ -9,16 +9,18 @@ import androidx.lifecycle.ViewModelProvider;
 public class ViewModelFactory implements ViewModelProvider.Factory {
 
     private Application application;
-    private long id;
+    private String roomId;
 
-    public ViewModelFactory(Application application, long id) {
+    public ViewModelFactory(Application application, String roomId) {
         this.application = application;
-        this.id = id;
+        this.roomId = roomId;
     }
 
     @NonNull
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        return (T) new com.hrithik.chatt.ViewModel(application, id);
+        if(roomId.equals(""))
+            return (T) new com.hrithik.chatt.ViewModel(application);
+        return (T) new com.hrithik.chatt.ViewModel(application, roomId);
     }
 }

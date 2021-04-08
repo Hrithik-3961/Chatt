@@ -1,18 +1,16 @@
 package com.hrithik.chatt;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-
-import com.google.firebase.database.Exclude;
 
 @Entity
 public class Users {
 
-    @PrimaryKey(autoGenerate = true)
-    @Exclude
-    private long id;
-
+    @PrimaryKey
+    @NonNull
     private String uid;
+
     private String name;
     private String emailId;
 
@@ -24,15 +22,6 @@ public class Users {
         this.uid = uid;
         this.name = name;
         this.emailId = emailId;
-    }
-
-    @Exclude
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getUid() {

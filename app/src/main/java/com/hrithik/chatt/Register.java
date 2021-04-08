@@ -92,9 +92,8 @@ public class Register extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            Toast.makeText(Register.this, "User created successfully", Toast.LENGTH_SHORT).show();
-                            DatabaseReference reference = database.getReference().child("user").child(auth.getUid());
-                            Users user = new Users(auth.getUid(), name, email);
+                            DatabaseReference reference = database.getReference().child("user").child(auth.getCurrentUser().getUid());
+                            final Users user = new Users(auth.getCurrentUser().getUid(), name, email);
                             reference.setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {

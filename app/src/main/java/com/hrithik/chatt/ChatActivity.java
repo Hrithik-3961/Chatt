@@ -1,18 +1,17 @@
 package com.hrithik.chatt;
 
+import android.os.Bundle;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.os.Bundle;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -25,7 +24,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -34,6 +32,7 @@ public class ChatActivity extends AppCompatActivity {
     private ImageView sendBtn, back;
     private RecyclerView recyclerView;
 
+    private long id = -1;
     private String name, receiverUid, senderUid;
     private String senderRoom, receiverRoom;
     private ArrayList<Messages> arrayList;
@@ -47,7 +46,6 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        viewModel = new ViewModelProvider(this, new ViewModelFactory(getApplication(), getIntent().getLongExtra("id", -1))).get(ViewModel.class);
         database = FirebaseDatabase.getInstance();
 
         name = getIntent().getStringExtra("name");
@@ -57,7 +55,7 @@ public class ChatActivity extends AppCompatActivity {
 
         senderRoom = senderUid + receiverUid;
         receiverRoom = receiverUid + senderUid;
-
+        viewModel = new ViewModelProvider(this, new ViewModelFactory(getApplication(), senderRoom)).get(ViewModel.class);
         user_name = findViewById(R.id.name);
         editMessage = findViewById(R.id.message);
         sendBtn = findViewById(R.id.sendBtn);
@@ -77,32 +75,52 @@ public class ChatActivity extends AppCompatActivity {
         messagesAdapter = new MessagesAdapter(this, arrayList);
         recyclerView.setAdapter(messagesAdapter);
 
+        recyclerView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v,
+                                       int left, int top, int right, int bottom,
+                                       int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                if (bottom < oldBottom)
+                    recyclerView.smoothScrollToPosition(recyclerView.getAdapter().getItemCount() - 1);
+            }
+        });
+
         user_name.setText(name);
 
+        viewModel.getMessages().observe(this, new Observer<UserMessages>() {
+
+            @Override
+            public void onChanged(UserMessages userMessages) {
+                if (userMessages != null) {
+                    arrayList.clear();
+                    arrayList.addAll(userMessages.getMsg());
+                    id = userMessages.getId();
+                    messagesAdapter.notifyDataSetChanged();
+                    recyclerView.scrollToPosition(recyclerView.getAdapter().getItemCount() - 1);
+                }
+            }
+        });
+
         DatabaseReference chatReference = database.getReference().child("chats").child(senderRoom).child("messages");
-        /*chatReference.addValueEventListener(new ValueEventListener() {
+        chatReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 arrayList.clear();
-                for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Messages msg = dataSnapshot.getValue(Messages.class);
                     arrayList.add(msg);
                 }
-                messagesAdapter.notifyDataSetChanged();
+                UserMessages receiverMsg = new UserMessages(arrayList, receiverRoom);
+                if (id != -1)
+                    receiverMsg.setId(id);
+                viewModel.insertMessage(receiverMsg);
+                messagesAdapter.notifyItemInserted(arrayList.size());
+                recyclerView.scrollToPosition(recyclerView.getAdapter().getItemCount() - 1);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
-            }
-        });*/
-
-        viewModel.getMessages().observe(this, new Observer<List<Messages>>() {
-            @Override
-            public void onChanged(List<Messages> messages) {
-                arrayList.clear();
-                arrayList.addAll(messages);
-                messagesAdapter.notifyDataSetChanged();
             }
         });
 
@@ -110,11 +128,16 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String message = editMessage.getText().toString().trim();
-                if(!message.isEmpty()) {
+                if (!message.isEmpty()) {
                     editMessage.setText(null);
                     Date date = new Date();
                     final Messages msg = new Messages(message, senderUid, date.getTime());
-
+                    arrayList.add(msg);
+                    messagesAdapter.notifyItemInserted(arrayList.size());
+                    UserMessages senderMsg = new UserMessages(arrayList, senderRoom);
+                    if (id != -1)
+                        senderMsg.setId(id);
+                    viewModel.insertMessage(senderMsg);
                     database.getReference().child("chats").child(senderRoom).child("messages").push().setValue(msg)
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
