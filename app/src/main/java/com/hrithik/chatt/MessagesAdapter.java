@@ -1,7 +1,6 @@
 package com.hrithik.chatt;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,8 +17,6 @@ public class MessagesAdapter extends RecyclerView.Adapter {
 
     Context context;
     ArrayList<Messages> arrayList;
-    private final int ITEM_SEND = 1;
-    private final int ITEM_RECEIVE = 2;
 
     public MessagesAdapter(Context context, ArrayList<Messages> arrayList) {
         this.context = context;
@@ -29,11 +26,11 @@ public class MessagesAdapter extends RecyclerView.Adapter {
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        if(viewType == ITEM_SEND){
+        Messages msg = arrayList.get(viewType);
+        if (FirebaseAuth.getInstance().getCurrentUser().getUid().equals(msg.getSenderId())) {
             View view = LayoutInflater.from(context).inflate(R.layout.sender_lyout_item, parent, false);
             return new SenderViewHolder(view);
-        }
-        else {
+        } else {
             View view = LayoutInflater.from(context).inflate(R.layout.receiver_layout_item, parent, false);
             return new ReceiverViewHolder(view);
         }
@@ -44,28 +41,25 @@ public class MessagesAdapter extends RecyclerView.Adapter {
 
         Messages msg = arrayList.get(position);
         Messages nxtMsg = new Messages();
-        if(position != 0)
-        nxtMsg = arrayList.get(position-1);
+        if (position != 0)
+            nxtMsg = arrayList.get(position - 1);
 
-        if(holder.getClass() == SenderViewHolder.class){
+        if (holder.getClass() == SenderViewHolder.class) {
             SenderViewHolder viewHolder = (SenderViewHolder) holder;
-            if(position != 0 && nxtMsg.getSenderId().equals(msg.getSenderId())) {
+            if (position != 0 && nxtMsg.getSenderId().equals(msg.getSenderId())) {
                 viewHolder.msgContinued.setText(msg.getMessage());
                 viewHolder.msgContinued.setVisibility(View.VISIBLE);
                 viewHolder.msg.setVisibility(View.GONE);
-            }
-            else
+            } else
                 viewHolder.msg.setText(msg.getMessage());
-        }
-        else {
+        } else {
             ReceiverViewHolder viewHolder = (ReceiverViewHolder) holder;
-            if(position != 0 && nxtMsg.getSenderId().equals(msg.getSenderId())) {
+            if (position != 0 && nxtMsg.getSenderId().equals(msg.getSenderId())) {
                 viewHolder.msgContinued.setText(msg.getMessage());
                 viewHolder.msgContinued.setVisibility(View.VISIBLE);
                 viewHolder.msg.setVisibility(View.GONE);
-            }
-            else
-            viewHolder.msg.setText(msg.getMessage());
+            } else
+                viewHolder.msg.setText(msg.getMessage());
         }
 
     }
@@ -76,15 +70,16 @@ public class MessagesAdapter extends RecyclerView.Adapter {
     }
 
     @Override
-    public int getItemViewType(int position) {
-        Messages msg = arrayList.get(position);
-        if(FirebaseAuth.getInstance().getCurrentUser().getUid().equals(msg.getSenderId()))
-            return ITEM_SEND;
-        else
-            return ITEM_RECEIVE;
+    public long getItemId(int position) {
+        return super.getItemId(position);
     }
 
-    class SenderViewHolder extends RecyclerView.ViewHolder {
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
+    static class SenderViewHolder extends RecyclerView.ViewHolder {
 
         TextView msg, msgContinued;
 
@@ -95,9 +90,10 @@ public class MessagesAdapter extends RecyclerView.Adapter {
         }
     }
 
-    class ReceiverViewHolder extends RecyclerView.ViewHolder {
+    static class ReceiverViewHolder extends RecyclerView.ViewHolder {
 
         TextView msg, msgContinued;
+
         public ReceiverViewHolder(@NonNull View itemView) {
             super(itemView);
             msg = itemView.findViewById(R.id.msgReceive);

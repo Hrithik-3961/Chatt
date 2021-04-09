@@ -32,7 +32,6 @@ public class ChatActivity extends AppCompatActivity {
     private ImageView sendBtn, back;
     private RecyclerView recyclerView;
 
-    private long id = -1;
     private String name, receiverUid, senderUid;
     private String senderRoom, receiverRoom;
     private ArrayList<Messages> arrayList;
@@ -72,13 +71,13 @@ public class ChatActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setHasFixedSize(true);
         messagesAdapter = new MessagesAdapter(this, arrayList);
         recyclerView.setAdapter(messagesAdapter);
 
         recyclerView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
-            public void onLayoutChange(View v,
-                                       int left, int top, int right, int bottom,
+            public void onLayoutChange(View v, int left, int top, int right, int bottom,
                                        int oldLeft, int oldTop, int oldRight, int oldBottom) {
                 if (bottom < oldBottom)
                     recyclerView.smoothScrollToPosition(recyclerView.getAdapter().getItemCount() - 1);
@@ -94,7 +93,6 @@ public class ChatActivity extends AppCompatActivity {
                 if (userMessages != null) {
                     arrayList.clear();
                     arrayList.addAll(userMessages.getMsg());
-                    id = userMessages.getId();
                     messagesAdapter.notifyDataSetChanged();
                     recyclerView.scrollToPosition(recyclerView.getAdapter().getItemCount() - 1);
                 }
@@ -110,9 +108,9 @@ public class ChatActivity extends AppCompatActivity {
                     Messages msg = dataSnapshot.getValue(Messages.class);
                     arrayList.add(msg);
                 }
+                UserMessages senderMsg = new UserMessages(arrayList, senderRoom);
                 UserMessages receiverMsg = new UserMessages(arrayList, receiverRoom);
-                if (id != -1)
-                    receiverMsg.setId(id);
+                viewModel.insertMessage(senderMsg);
                 viewModel.insertMessage(receiverMsg);
                 messagesAdapter.notifyItemInserted(arrayList.size());
                 recyclerView.scrollToPosition(recyclerView.getAdapter().getItemCount() - 1);
@@ -135,8 +133,6 @@ public class ChatActivity extends AppCompatActivity {
                     arrayList.add(msg);
                     messagesAdapter.notifyItemInserted(arrayList.size());
                     UserMessages senderMsg = new UserMessages(arrayList, senderRoom);
-                    if (id != -1)
-                        senderMsg.setId(id);
                     viewModel.insertMessage(senderMsg);
                     database.getReference().child("chats").child(senderRoom).child("messages").push().setValue(msg)
                             .addOnCompleteListener(new OnCompleteListener<Void>() {

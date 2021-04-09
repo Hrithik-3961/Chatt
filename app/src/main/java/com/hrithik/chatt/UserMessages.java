@@ -1,10 +1,9 @@
 package com.hrithik.chatt;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
-
-import com.google.firebase.database.Exclude;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,30 +11,20 @@ import java.util.List;
 @Entity
 public class UserMessages {
 
-    @PrimaryKey(autoGenerate = true)
-    @Exclude
-    private long id;
-
     @TypeConverters(Converter.class)
     ArrayList<Messages> msg;
 
+    @PrimaryKey
+    @NonNull
     String roomId;
 
     public UserMessages() {
+        //required for firebase
     }
 
     public UserMessages(ArrayList<Messages> msg, String roomId) {
         this.msg = msg;
         this.roomId = roomId;
-    }
-
-    @Exclude
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public List<Messages> getMsg() {

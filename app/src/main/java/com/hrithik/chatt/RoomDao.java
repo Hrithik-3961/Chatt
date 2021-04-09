@@ -20,7 +20,7 @@ public interface RoomDao {
     @Query("SELECT * FROM Users")
     LiveData<List<Users>> getAllUsers();
 
-    @Query("SELECT * FROM UserMessages WHERE roomId = :roomId")
+    @Query("SELECT * FROM UserMessages WHERE roomId == :roomId")
     LiveData<UserMessages> getMessages(String roomId);
 
 }
