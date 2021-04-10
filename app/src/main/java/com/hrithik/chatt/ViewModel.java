@@ -33,10 +33,6 @@ public class ViewModel extends AndroidViewModel {
         repository.insertMessage(msg);
     }
 
-    public void clearAllTables() {
-        repository.clearAllTables();
-    }
-
     public LiveData<List<Users>> getAllUsers() {
         return allUsers;
     }

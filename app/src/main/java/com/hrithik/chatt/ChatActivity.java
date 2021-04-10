@@ -79,8 +79,8 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onLayoutChange(View v, int left, int top, int right, int bottom,
                                        int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                if (bottom < oldBottom)
-                    recyclerView.smoothScrollToPosition(recyclerView.getAdapter().getItemCount() - 1);
+                if (bottom < oldBottom && messagesAdapter.getItemCount() != 0)
+                    recyclerView.smoothScrollToPosition(messagesAdapter.getItemCount() - 1);
             }
         });
 
@@ -94,7 +94,8 @@ public class ChatActivity extends AppCompatActivity {
                     arrayList.clear();
                     arrayList.addAll(userMessages.getMsg());
                     messagesAdapter.notifyDataSetChanged();
-                    recyclerView.scrollToPosition(recyclerView.getAdapter().getItemCount() - 1);
+                    if (messagesAdapter.getItemCount() != 0)
+                        recyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
                 }
             }
         });
@@ -113,7 +114,8 @@ public class ChatActivity extends AppCompatActivity {
                 viewModel.insertMessage(senderMsg);
                 viewModel.insertMessage(receiverMsg);
                 messagesAdapter.notifyItemInserted(arrayList.size());
-                recyclerView.scrollToPosition(recyclerView.getAdapter().getItemCount() - 1);
+                if (messagesAdapter.getItemCount() != 0)
+                    recyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
             }
 
             @Override

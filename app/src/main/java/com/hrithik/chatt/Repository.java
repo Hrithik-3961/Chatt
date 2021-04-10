@@ -47,15 +47,6 @@ public class Repository {
         });
     }
 
-    public void clearAllTables(){
-        executorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                roomDatabase.clearAllTables();
-            }
-        });
-    }
-
     public LiveData<List<Users>> getAllUsers() {
         return allUsers;
     }
