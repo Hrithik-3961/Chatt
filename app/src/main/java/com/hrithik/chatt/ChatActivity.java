@@ -72,7 +72,7 @@ public class ChatActivity extends AppCompatActivity {
         layoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
-        messagesAdapter = new MessagesAdapter(this, arrayList);
+        messagesAdapter = new MessagesAdapter(this, arrayList, getWindowManager());
         recyclerView.setAdapter(messagesAdapter);
 
         recyclerView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
